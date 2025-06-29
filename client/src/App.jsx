@@ -18,7 +18,7 @@ function App() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/me", {
+        const res = await fetch("https://realtime-location-app.onrender.com/api/me", {
           credentials: "include",
         });
 
@@ -41,7 +41,7 @@ function App() {
     const fetchGroupsAndSetFirst = async () => {
       if (user && !groupId) {
         try {
-          const res = await fetch("http://localhost:3000/api/groups", {
+          const res = await fetch("https://realtime-location-app.onrender.com/api/groups", {
             credentials: "include",
           });
           if (!res.ok) throw new Error("Failed to fetch groups");
@@ -74,7 +74,7 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:3000/api/logout", {
+      await fetch("https://realtime-location-app.onrender.com/api/logout", {
         method: "POST",
         credentials: "include",
       });

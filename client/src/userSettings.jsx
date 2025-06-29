@@ -51,7 +51,7 @@ export default function UserSettings({ user, setUser }) {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:3000/api/userSettings", {
+      const res = await fetch("https://realtime-location-app.onrender.com/api/userSettings", {
         method: "PATCH",
         credentials: "include",
         body: formData,
@@ -142,7 +142,7 @@ export default function UserSettings({ user, setUser }) {
               />
               {(avatarPreview || user?.avatar) && (
                 <img
-                  src={avatarPreview || `http://localhost:3000/uploads/${user.avatar}`}
+                  src={avatarPreview || `https://realtime-location-app.onrender.com/uploads/${user.avatar}`}
                   alt="Avatar"
                   className="w-16 h-16 rounded-full border object-cover shadow"
                 />

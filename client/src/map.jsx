@@ -5,7 +5,7 @@ import Loader from "./loader";
 import io from "socket.io-client";
 import { ClipboardCopy, Check } from "lucide-react";
 
-const socket = io("http://localhost:3000", { withCredentials: true });
+const socket = io("https://realtime-location-app.onrender.com", { withCredentials: true });
 
 function MyMap({ setGroupId }) {
   const [position, setPosition] = useState(null);
@@ -17,7 +17,7 @@ function MyMap({ setGroupId }) {
 
   const sendLocationToServer = async (lat, lng) => {
     try {
-      await fetch("http://localhost:3000/api/location", {
+      await fetch("https://realtime-location-app.onrender.com/api/location", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -30,7 +30,7 @@ function MyMap({ setGroupId }) {
 
   const fetchUserGroups = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/groups", {
+      const res = await fetch("https://realtime-location-app.onrender.com/api/groups", {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch groups");
@@ -159,7 +159,7 @@ function MyMap({ setGroupId }) {
               <strong className="block mb-1 text-blue-600 font-semibold">{loc.name}</strong>
               {loc.avatar && (
                 <img
-                  src={`http://localhost:3000/uploads/${loc.avatar}`}
+                  src={`https://realtime-location-app.onrender.com/uploads/${loc.avatar}`}
                   alt="avatar"
                   className="w-12 h-12 rounded-full border-2 border-blue-400 shadow-md mt-2"
                 />

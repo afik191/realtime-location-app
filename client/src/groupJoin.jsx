@@ -16,7 +16,7 @@ function GroupJoin({ setGroupId }) {
     }
 
     try {
-      const joinRes = await fetch(`http://localhost:3000/api/group/${inputId}/join`, {
+      const joinRes = await fetch(`https://realtime-location-app.onrender.com/api/group/${inputId}/join`, {
         method: "POST",
         credentials: "include",
       });
@@ -24,7 +24,7 @@ function GroupJoin({ setGroupId }) {
       if (!joinRes.ok) throw new Error("Failed to join group");
 
       const locationRes = await fetch(
-        `http://localhost:3000/api/group/${inputId}/locations`,
+        `https://realtime-location-app.onrender.com/api/group/${inputId}/locations`,
         { credentials: "include" }
       );
 
@@ -45,7 +45,7 @@ function GroupJoin({ setGroupId }) {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/api/group", {
+      const res = await fetch("https://realtime-location-app.onrender.com/api/group", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

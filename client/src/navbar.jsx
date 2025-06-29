@@ -71,7 +71,7 @@ export default function MainNavBar({ user, onAuthClick, onLogout, onJoinGroup })
           >
             {user?.avatar ? (
               <img
-                src={`http://localhost:3000/uploads/${user.avatar}`}
+                src={`https://realtime-location-app.onrender.com/uploads/${user.avatar}`}
                 alt="User Avatar"
                 className="w-full h-full object-cover"
                 draggable={false}

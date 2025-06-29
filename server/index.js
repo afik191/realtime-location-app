@@ -26,7 +26,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "https://realtime-location-app-pied.vercel.app",
     credentials: true,
   },
 });
@@ -41,7 +41,7 @@ const __dirname = path.dirname(__filename);
 
 const upload = multer({ dest: "uploads/" });
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: "https://realtime-location-app-pied.vercel.app", credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -302,5 +302,5 @@ app.patch("/api/userSettings", authMiddleware, upload.single("avatar"), async (r
 });
 
 server.listen(port, () => {
-  console.log(`🚀 Server with sockets running on http://localhost:${port}`);
+  console.log(`🚀 Server with sockets running on https://realtime-location-app-pied.vercel.app(${port})`);
 });

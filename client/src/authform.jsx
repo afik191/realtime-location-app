@@ -15,7 +15,7 @@ async function submit(user, mode) {
     }
   }
 
-  const response = await fetch(`http://localhost:3000/api/${mode}`, {
+  const response = await fetch(`https://realtime-location-app.onrender.com/api/${mode}`, {
     method: "POST",
     body: formPayload,
     credentials: "include",
