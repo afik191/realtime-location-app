@@ -73,7 +73,7 @@ app.post("/api/register", upload.single("avatar"), async (req, res) => {
       httpOnly: true,
       sameSite: "Lax",
       secure: process.env.NODE_ENV === "production",
-      maxAge: 2 * 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.json({ message: "Registration and login successful", user: payload });
@@ -104,7 +104,7 @@ app.post("/api/login", upload.none(), async (req, res) => {
       httpOnly: true,
       sameSite: "Lax",
       secure: process.env.NODE_ENV === "production",
-      maxAge: 2 * 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.json({ message: "Login successful", user: payload });
@@ -291,7 +291,7 @@ app.patch("/api/userSettings", authMiddleware, upload.single("avatar"), async (r
       httpOnly: true,
       sameSite: "Lax",
       secure: process.env.NODE_ENV === "production",
-      maxAge: 2 * 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.json({ message: "Profile updated successfully", user: payload });
