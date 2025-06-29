@@ -67,7 +67,7 @@ app.post("/api/register", upload.single("avatar"), async (req, res) => {
       avatar: insertedUser.avatar,
     };
 
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "2d" });
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -98,7 +98,7 @@ app.post("/api/login", upload.none(), async (req, res) => {
       avatar: user.avatar,
     };
 
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "2d" });
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
 
     res.cookie("token", token, {
       httpOnly: true,
