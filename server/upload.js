@@ -3,8 +3,6 @@ import multer from 'multer';
 import cloudinary from './cloudinary.js';
 import fs from 'fs';
 
-
-
 if (!fs.existsSync("temp")) {
   fs.mkdirSync("temp");
 }
@@ -26,4 +24,5 @@ router.post('/', upload.single('avatar'), async (req, res) => {
   }
 });
 
+export { upload };
 export default router;

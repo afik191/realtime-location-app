@@ -1,7 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import multer from "multer";
 import path from "path";
 import { fileURLToPath } from "url";
 import {
@@ -21,13 +20,12 @@ import { ObjectId } from "mongodb";
 import { Server } from "socket.io";
 import http from "http";
 import fs from "fs";
-import uploadRoutes from './upload.js';
+import uploadRoutes, { upload } from './upload.js';  // <-- ייבוא upload יחד עם uploadRoutes
 import cloudinary from './cloudinary.js';
-
-
 
 const app = express();
 app.use('/api/upload', uploadRoutes);
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -37,22 +35,14 @@ const io = new Server(server, {
 });
 
 const port = process.env.PORT || 3000;
-
 const JWT_SECRET = process.env.JWT_SECRET;
 
 await connectToDB();
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
-
 
 app.use(cors({ origin: ["https://realtime-location-app-1.onrender.com"], credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-
-
 
 
 app.post("/api/register", upload.single("avatar"), async (req, res) => {
