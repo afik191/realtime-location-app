@@ -264,7 +264,7 @@ app.patch("/api/userSettings", authMiddleware, upload.single("avatar"), async (r
       { returnDocument: "after", projection: { password: 0 } }
     );
 
-    const updatedUser = result.value;
+    const updatedUser = result;
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
