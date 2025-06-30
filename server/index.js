@@ -26,7 +26,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://realtime-location-app-1.onrender.com",
+    origin: ["https://realtime-location-app-1.onrender.com"],
     credentials: true,
   },
 });
@@ -41,7 +41,7 @@ const __dirname = path.dirname(__filename);
 
 const upload = multer({ dest: "uploads/" });
 
-app.use(cors({ origin: "https://realtime-location-app-1.onrender.com", credentials: true }));
+app.use(cors({ origin: ["https://realtime-location-app-1.onrender.com"], credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
