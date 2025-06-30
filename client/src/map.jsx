@@ -159,7 +159,7 @@ function MyMap({ setGroupId }) {
               <strong className="block mb-1 text-blue-600 font-semibold">{loc.name}</strong>
               {loc.avatar && (
                 <img
-                  src={`https://realtime-location-app.onrender.com/uploads/${loc.avatar}`}
+                  src={loc.avatar}
                   alt="avatar"
                   className="w-12 h-12 rounded-full border-2 border-blue-400 shadow-md mt-2"
                 />

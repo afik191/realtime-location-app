@@ -142,7 +142,7 @@ export default function UserSettings({ user, setUser }) {
               />
               {(avatarPreview || user?.avatar) && (
                 <img
-                  src={avatarPreview || `https://realtime-location-app.onrender.com/uploads/${user.avatar}`}
+                  src={avatarPreview || user.avatar}
                   alt="Avatar"
                   className="w-16 h-16 rounded-full border object-cover shadow"
                 />

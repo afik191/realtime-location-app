@@ -21,8 +21,13 @@ import { ObjectId } from "mongodb";
 import { Server } from "socket.io";
 import http from "http";
 import fs from "fs";
+import uploadRoutes from './upload.js';
+import cloudinary from './cloudinary';
+
+
 
 const app = express();
+app.use('/api/upload', uploadRoutes);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -31,32 +36,40 @@ const io = new Server(server, {
   },
 });
 
-const port = 3000;
+const port = process.env.PORT || 3000;
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
 await connectToDB();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
-const upload = multer({ dest: "uploads/" });
 
 app.use(cors({ origin: ["https://realtime-location-app-1.onrender.com"], credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use("/uploads", express.static("uploads"));
 
 
-app.get("/", async (req,res)=>{
-res.render("https://realtime-location-app-1.onrender.com/");
-})
+
+
 
 app.post("/api/register", upload.single("avatar"), async (req, res) => {
   try {
+    let avatarUrl = null;
+
+    if (req.file) {
+      const cloudinaryResult = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'avatars',
+      });
+      fs.unlinkSync(req.file.path); // Clean up temp
+      avatarUrl = cloudinaryResult.secure_url;
+    }
+
     const user = {
       ...req.body,
-      avatar: req.file ? req.file.filename : null,
+      avatar: avatarUrl,
     };
 
     const insertedUser = await insertUser(user);
@@ -72,17 +85,18 @@ app.post("/api/register", upload.single("avatar"), async (req, res) => {
       avatar: insertedUser.avatar,
     };
 
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "2d" });
 
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "none",
       secure: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 2 * 24 * 60 * 60 * 1000,
     });
 
     res.json({ message: "Registration and login successful", user: payload });
   } catch (err) {
+    console.error("Registration error:", err);
     res.status(500).json({ message: "Registration failed" });
   }
 });
@@ -103,13 +117,13 @@ app.post("/api/login", upload.none(), async (req, res) => {
       avatar: user.avatar,
     };
 
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "2d" });
 
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "none",
       secure: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 2 * 24 * 60 * 60 * 1000,
     });
 
     res.json({ message: "Login successful", user: payload });
@@ -232,57 +246,39 @@ io.on("connection", (socket) => {
 
 app.patch("/api/userSettings", authMiddleware, upload.single("avatar"), async (req, res) => {
   try {
-      
     const userId = req.user.id;
     const { firstName, lastName } = req.body;
     const db = getDB();
     const users = db.collection("users");
 
     const updateData = {};
-    
-    if (firstName && firstName.trim() !== "") {
-      updateData.firstName = firstName.trim();
-    }
 
-    if (lastName && lastName.trim() !== "") {
-      updateData.lastName = lastName.trim();
-    }
+    if (firstName?.trim()) updateData.firstName = firstName.trim();
+    if (lastName?.trim()) updateData.lastName = lastName.trim();
 
     if (req.file) {
-      //new photo
-      updateData.avatar = req.file.filename;
-    
-      // deleting the old photo
-      const user = await users.findOne({ _id: new ObjectId(userId) });
-      if (user?.avatar) {
-        const oldAvatarPath = path.join("uploads", user.avatar);
-        fs.unlink(oldAvatarPath, (err) => {
-          if (err) console.warn("⚠️ Failed to delete old avatar:", err.message);
-        });
-      }
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'avatars',
+      });
+      fs.unlinkSync(req.file.path); 
+      updateData.avatar = result.secure_url;
     }
 
-    
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ message: "No changes provided" });
     }
-  
-   const result = await users.findOneAndUpdate(
-     { _id: new ObjectId(userId) },
-     { $set: updateData },
-     {
-       returnDocument: "after",
-       projection: { password: 0 },
-     }
-   );
-    const updatedUser = result;
-    
+
+    const result = await users.findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      { $set: updateData },
+      { returnDocument: "after", projection: { password: 0 } }
+    );
+
+    const updatedUser = result.value;
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
-    
 
-    
     const payload = {
       id: updatedUser._id,
       email: updatedUser.email,
@@ -296,7 +292,7 @@ app.patch("/api/userSettings", authMiddleware, upload.single("avatar"), async (r
       httpOnly: true,
       sameSite: "none",
       secure: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 2 * 24 * 60 * 60 * 1000,
     });
 
     res.json({ message: "Profile updated successfully", user: payload });
@@ -307,5 +303,5 @@ app.patch("/api/userSettings", authMiddleware, upload.single("avatar"), async (r
 });
 
 server.listen(port, () => {
-  console.log(`🚀 Server with sockets running on https://realtime-location-app-pied.vercel.app(${port})`);
+  console.log(`🚀 Server running at https://realtime-location-app.onrender.com`);
 });

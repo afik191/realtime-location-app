@@ -13,6 +13,7 @@ if (!uri) {
 const client = new MongoClient(uri);
 let db;
 
+
 export async function connectToDB() {
   try {
     await client.connect();
