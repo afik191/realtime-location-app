@@ -76,8 +76,8 @@ app.post("/api/register", upload.single("avatar"), async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "Lax",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -107,8 +107,8 @@ app.post("/api/login", upload.none(), async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "Lax",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -294,8 +294,8 @@ app.patch("/api/userSettings", authMiddleware, upload.single("avatar"), async (r
 
     res.cookie("token", newToken, {
       httpOnly: true,
-      sameSite: "Lax",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
