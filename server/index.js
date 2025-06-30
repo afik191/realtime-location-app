@@ -47,6 +47,11 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/uploads", express.static("uploads"));
 
+
+// app.get("/", async (req,res)=>{
+// res.render("")
+// })
+
 app.post("/api/register", upload.single("avatar"), async (req, res) => {
   try {
     const user = {
