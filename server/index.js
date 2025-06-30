@@ -22,7 +22,7 @@ import { Server } from "socket.io";
 import http from "http";
 import fs from "fs";
 import uploadRoutes from './upload.js';
-import cloudinary from './cloudinary';
+import cloudinary from './cloudinary.js';
 
 
 
