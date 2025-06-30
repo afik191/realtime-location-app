@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import cloudinary from './cloudinary';
+import cloudinary from './cloudinary.js';
 import fs from 'fs';
 
 
