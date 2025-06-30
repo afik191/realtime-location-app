@@ -26,7 +26,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://realtime-location-app-pied.vercel.app",
+    origin: "https://realtime-location-app-1.onrender.com",
     credentials: true,
   },
 });
@@ -41,16 +41,16 @@ const __dirname = path.dirname(__filename);
 
 const upload = multer({ dest: "uploads/" });
 
-app.use(cors({ origin: "https://realtime-location-app-pied.vercel.app", credentials: true }));
+app.use(cors({ origin: "https://realtime-location-app-1.onrender.com", credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/uploads", express.static("uploads"));
 
 
-// app.get("/", async (req,res)=>{
-// res.render("")
-// })
+app.get("/", async (req,res)=>{
+res.render("https://realtime-location-app-1.onrender.com/");
+})
 
 app.post("/api/register", upload.single("avatar"), async (req, res) => {
   try {
