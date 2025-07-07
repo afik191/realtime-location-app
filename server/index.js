@@ -20,16 +20,17 @@ import { ObjectId } from "mongodb";
 import { Server } from "socket.io";
 import http from "http";
 import fs from "fs";
-import uploadRoutes, { upload } from './upload.js';  // <-- ייבוא upload יחד עם uploadRoutes
-import cloudinary from './cloudinary.js';
+import uploadRoutes, { upload } from "./upload.js";
+import cloudinary from "./cloudinary.js";
 
 const app = express();
-app.use('/api/upload', uploadRoutes);
+app.use("/api/upload", uploadRoutes);
 
 const server = http.createServer(app);
+
 const io = new Server(server, {
   cors: {
-    origin: ["https://realtime-location-app-1.onrender.com"],
+    origin: true,
     credentials: true,
   },
 });
@@ -39,11 +40,14 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 await connectToDB();
 
-app.use(cors({ origin: ["https://realtime-location-app-1.onrender.com"], credentials: true }));
+app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// ---------------------------
+//       API ROUTES
+// ---------------------------
 
 app.post("/api/register", upload.single("avatar"), async (req, res) => {
   try {
@@ -51,9 +55,9 @@ app.post("/api/register", upload.single("avatar"), async (req, res) => {
 
     if (req.file) {
       const cloudinaryResult = await cloudinary.uploader.upload(req.file.path, {
-        folder: 'avatars',
+        folder: "avatars",
       });
-      fs.unlinkSync(req.file.path); // Clean up temp
+      fs.unlinkSync(req.file.path);
       avatarUrl = cloudinaryResult.secure_url;
     }
 
@@ -79,7 +83,7 @@ app.post("/api/register", upload.single("avatar"), async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "none",
+      sameSite: "lax", 
       secure: true,
       maxAge: 2 * 24 * 60 * 60 * 1000,
     });
@@ -111,7 +115,7 @@ app.post("/api/login", upload.none(), async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "none",
+      sameSite: "lax",
       secure: true,
       maxAge: 2 * 24 * 60 * 60 * 1000,
     });
@@ -221,19 +225,6 @@ app.get("/api/group/:groupId/locations", authMiddleware, async (req, res) => {
   }
 });
 
-io.on("connection", (socket) => {
-  console.log("🔌 Socket connected:", socket.id);
-
-  socket.on("join-group", (groupId) => {
-    socket.join(groupId);
-    console.log(`✅ Socket ${socket.id} joined group ${groupId}`);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("❌ Socket disconnected:", socket.id);
-  });
-});
-
 app.patch("/api/userSettings", authMiddleware, upload.single("avatar"), async (req, res) => {
   try {
     const userId = req.user.id;
@@ -248,9 +239,9 @@ app.patch("/api/userSettings", authMiddleware, upload.single("avatar"), async (r
 
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: 'avatars',
+        folder: "avatars",
       });
-      fs.unlinkSync(req.file.path); 
+      fs.unlinkSync(req.file.path);
       updateData.avatar = result.secure_url;
     }
 
@@ -280,18 +271,54 @@ app.patch("/api/userSettings", authMiddleware, upload.single("avatar"), async (r
 
     res.cookie("token", newToken, {
       httpOnly: true,
-      sameSite: "none",
+      sameSite: "lax",
       secure: true,
       maxAge: 2 * 24 * 60 * 60 * 1000,
     });
 
     res.json({ message: "Profile updated successfully", user: payload });
   } catch (err) {
-    console.error("❌ Error updating user:", err);
+    console.error("Error updating user:", err);
     res.status(500).json({ message: "Failed to update profile" });
   }
 });
 
+// ---------------------------
+//       SOCKET.IO
+// ---------------------------
+io.on("connection", (socket) => {
+  console.log("🔌 Socket connected:", socket.id);
+
+  socket.on("join-group", (groupId) => {
+    socket.join(groupId);
+    console.log(`✅ Socket ${socket.id} joined group ${groupId}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("❌ Socket disconnected:", socket.id);
+  });
+});
+
+// ---------------------------
+//     SERVE REACT BUILD
+// ---------------------------
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
+const clientBuildPath = path.join(__dirname, "client-build");
+
+app.use(express.static(clientBuildPath));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientBuildPath, "index.html"));
+});
+
+// ---------------------------
+//         START SERVER
+// ---------------------------
+
 server.listen(port, () => {
-  console.log(`🚀 Server running at https://realtime-location-app.onrender.com`);
+  console.log(`🚀 Server running at http://localhost:${port}`);
 });
