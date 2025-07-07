@@ -310,7 +310,7 @@ io.on("connection", (socket) => {
 // ---------------------------
 
 
-app.get('*', async (req, res) => {
+app.all('*', async (req, res) => {
   res.sendFile(path.join(__dirname, 'client-build', 'index.html'));
 });
 
