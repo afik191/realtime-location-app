@@ -312,9 +312,9 @@ const clientBuildPath = path.join(__dirname, "client", "dist");
 
 app.use(express.static(clientBuildPath));
 
-app.get("/*", function (req, res) {
-  res.sendFile(path.resolve(clientBuildPath, "index.html"));
-});
+// app.get("/*", function (req, res) {
+//   res.sendFile(path.resolve(clientBuildPath, "index.html"));
+// });
 
 
 // ---------------------------
