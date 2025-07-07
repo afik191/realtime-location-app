@@ -307,7 +307,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-const clientBuildPath = path.join(__dirname, "client-build");
+const clientBuildPath = path.join(__dirname, "client", "dist"); 
+
 
 app.use(express.static(clientBuildPath));
 
