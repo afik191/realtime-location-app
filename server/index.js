@@ -311,9 +311,10 @@ const clientBuildPath = path.join(__dirname, "client-build");
 
 app.use(express.static(clientBuildPath));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(clientBuildPath, "index.html"));
+app.get("/*", function (req, res) {
+  res.sendFile(path.resolve(clientBuildPath, "index.html"));
 });
+
 
 // ---------------------------
 //         START SERVER
