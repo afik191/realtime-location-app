@@ -310,8 +310,8 @@ io.on("connection", (socket) => {
 // ---------------------------
 
 
-app.get("/", function (req, res) {
-  res.sendFile(path.resolve(clientBuildPath, "index.html"));
+app.get('/*', async (req, res) => {
+  res.sendFile(path.join(__dirname, 'client-build', 'index.html'));
 });
 
 
