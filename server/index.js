@@ -216,6 +216,10 @@ app.post("/api/group/:groupId/join", authMiddleware, async (req, res) => {
   }
 });
 
+app.delete("/api/deleteUser",authMiddleware,async (req,res)=>{
+  
+})
+
 app.get("/api/group/:groupId/locations", authMiddleware, async (req, res) => {
   const groupId = req.params.groupId;
 
