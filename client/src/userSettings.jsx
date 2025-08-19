@@ -9,6 +9,7 @@ export default function UserSettings({ user, setUser }) {
   const [avatarPreview, setAvatarPreview] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,11 +45,14 @@ export default function UserSettings({ user, setUser }) {
     setMessage("");
 
     try {
-      const res = await fetch("https://realtime-location-app.onrender.com/api/userSettings", {
-        method: "PATCH",
-        credentials: "include",
-        body: formData,
-      });
+      const res = await fetch(
+        "https://realtime-location-app.onrender.com/api/userSettings",
+        {
+          method: "PATCH",
+          credentials: "include",
+          body: formData,
+        }
+      );
 
       if (!res.ok) {
         const errData = await res.json();
@@ -68,16 +72,18 @@ export default function UserSettings({ user, setUser }) {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("⚠️ Are you sure you want to delete your account? This action cannot be undone.")) return;
-
+    setShowDeleteConfirm(false);
     setLoading(true);
     setMessage("");
 
     try {
-      const res = await fetch("https://realtime-location-app.onrender.com/api/deleteUser", {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const res = await fetch(
+        "https://realtime-location-app.onrender.com/api/deleteUser",
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
 
       if (!res.ok) {
         const errData = await res.json();
@@ -100,7 +106,7 @@ export default function UserSettings({ user, setUser }) {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-6"
+      className="min-h-screen flex flex-col items-center justify-center p-6 overflow-auto"
       style={{
         background: `radial-gradient(circle at top left, #60a5fa, transparent 30%),
                      radial-gradient(circle at bottom right, #3b82f6, transparent 40%),
@@ -180,7 +186,7 @@ export default function UserSettings({ user, setUser }) {
 
             <button
               type="button"
-              onClick={handleDelete}
+              onClick={() => setShowDeleteConfirm(true)}
               disabled={loading}
               className="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition disabled:opacity-50"
             >
@@ -200,6 +206,30 @@ export default function UserSettings({ user, setUser }) {
           )}
         </form>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full text-center">
+            <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
+            <p className="mb-6">Are you sure you want to delete your account? This action cannot be undone.</p>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={handleDelete}
+                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="bg-gray-300 px-4 py-2 rounded-lg hover:bg-gray-400 transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
