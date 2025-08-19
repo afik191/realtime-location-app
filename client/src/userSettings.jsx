@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Camera } from "lucide-react";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function UserSettings({ user, setUser }) {
   const [firstName, setFirstName] = useState(user?.firstName || "");
@@ -9,6 +9,7 @@ export default function UserSettings({ user, setUser }) {
   const [avatarPreview, setAvatarPreview] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (avatar) {
@@ -24,16 +25,8 @@ export default function UserSettings({ user, setUser }) {
     e.preventDefault();
 
     const formData = new FormData();
-
-    // שליחת שדות ששונו בלבד
-    if (firstName.trim() !== user?.firstName) {
-      formData.append("firstName", firstName.trim());
-    }
-
-    if (lastName.trim() !== user?.lastName) {
-      formData.append("lastName", lastName.trim());
-    }
-
+    if (firstName.trim() !== user?.firstName) formData.append("firstName", firstName.trim());
+    if (lastName.trim() !== user?.lastName) formData.append("lastName", lastName.trim());
     if (avatar) {
       if (avatar.size > 2 * 1024 * 1024) {
         setMessage("❌ Avatar file too large (max 2MB)");
@@ -42,7 +35,6 @@ export default function UserSettings({ user, setUser }) {
       formData.append("avatar", avatar);
     }
 
-    // אם אין שינוי – החזר הודעה
     if (formData.entries().next().done) {
       setMessage("Nothing to update");
       return;
@@ -64,12 +56,37 @@ export default function UserSettings({ user, setUser }) {
       }
 
       const data = await res.json();
-
-      // השרת מחזיר payload בשם 'user'
       setUser(data.user);
       setMessage("✅ Profile updated successfully");
       setAvatar(null);
       setAvatarPreview("");
+    } catch (err) {
+      setMessage("❌ Error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm("⚠️ Are you sure you want to delete your account? This action cannot be undone.")) return;
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const res = await fetch("https://realtime-location-app.onrender.com/api/deleteUser", {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || "Delete failed");
+      }
+
+      setUser(null);
+      setMessage("✅ Your account has been deleted");
+      navigate("/");
     } catch (err) {
       setMessage("❌ Error: " + err.message);
     } finally {
@@ -151,46 +168,25 @@ export default function UserSettings({ user, setUser }) {
             </div>
           </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
-          >
-            {loading ? "Saving..." : "Save Changes"}
-          </button>
-             // בתוך הטופס, מתחת לכפתור Save Changes
-          <button
-           type="button"
-           onClick={async () => {
-              if (!window.confirm("⚠️ Are you sure you want to delete your account? This action cannot be undone.")) return;
-              setLoading(true);
-              setMessage("");
-              try {
-                 const res = await fetch("https://realtime-location-app.onrender.com/api/deleteUser", {
-                   method: "DELETE",
-                   credentials: "include",
-                  });
+          {/* Buttons */}
+          <div className="flex flex-col gap-3">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+            >
+              {loading ? "Saving..." : "Save Changes"}
+            </button>
 
-              if (!res.ok) {
-                 const errData = await res.json();
-                 throw new Error(errData.message || "Delete failed");
-              }
-
-     
-           setUser(null);
-          setMessage("✅ Your account has been deleted");
-          Navigate("/");
-          } catch (err) {
-            setMessage("❌ Error: " + err.message);
-          } finally {
-            setLoading(false);
-          }
-       }}
-       className="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition disabled:opacity-50 mt-2"
-      >
-       Delete Account
-      </button>
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={loading}
+              className="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+            >
+              Delete Account
+            </button>
+          </div>
 
           {/* Feedback Message */}
           {message && (
